@@ -2,3 +2,4 @@
 .env
 
 # draft notebooks
+notebooks/data_extraction-draft.ipynb
