@@ -22,13 +22,181 @@ import re
 import datetime
 import json
 import math
+import dotenv
+import os
+dotenv.load_dotenv()
+
+AIR_SCRAPPER_API_KEY = os.getenv("AIR_SCRAPPER_KEY")
 
 # import suppor functions
 import sys 
 sys.path.append("..")
 
+### Flights - air scrapper - API
+def map_airport_codes(dictionary,country):
 
-### Acommodations - booking -scraping
+    navigation = dictionary["navigation"]
+
+    result_dict = dict()
+    result_dict["country"] = country
+    
+    result_dict_assigner = {
+        "city": lambda nav: nav["relevantHotelParams"]["localizedName"],
+        "city_entityId": lambda nav: nav["relevantHotelParams"]["entityId"],
+        "skyId": lambda nav: nav["relevantFlightParams"]["skyId"],
+        "entityId": lambda nav: nav["relevantFlightParams"]["entityId"],
+        "airport_name": lambda nav: nav["relevantFlightParams"]["localizedName"]
+    }
+
+    for key, function in result_dict_assigner.items():
+        try:
+            result_dict[key] = function(navigation)
+        except:
+            result_dict[key] = np.nan
+    return result_dict
+
+
+def get_country_airport_codes(response_data,country):
+
+    airport_data_filtered = list(filter(lambda dictionary: True if dictionary["navigation"]["entityType"] == "AIRPORT" else False,response_data))
+
+    airport_codes_dict_list = list(map(lambda dictionary: map_airport_codes(dictionary, country), airport_data_filtered))
+
+    return airport_codes_dict_list
+
+
+def create_country_airport_code_df(list_of_countries):
+    
+    list_of_countries_airports = list()
+
+    for country in list_of_countries:
+
+        url = "https://sky-scrapper.p.rapidapi.com/api/v1/flights/searchAirport"
+
+        querystring = {"query": country,"locale":"en-US"}
+
+        headers = {
+            "x-rapidapi-key": AIR_SCRAPPER_API_KEY,
+            "x-rapidapi-host": "sky-scrapper.p.rapidapi.com"
+        }
+
+        response = requests.get(url, headers=headers, params=querystring)
+
+        response_data = response.json()["data"]
+        list_of_countries_airports.extend(get_country_airport_codes(response_data,country))
+    
+    countries_airports = pd.DataFrame(list_of_countries_airports)
+    
+    return countries_airports
+
+
+def extract_flight_info(flight_dict):
+
+    flight_result_dict = {}
+
+    flight_result_dict_assigner = {
+        'duration': lambda flight: int(flight['legs'][0]['durationInMinutes']),
+        'price': lambda flight: int(flight['price']['formatted'].split()[0].replace(",","")),
+        'price_currency': lambda flight: flight['price']['formatted'].split()[1],
+        'stops': lambda flight: int(flight['legs'][0]['stopCount']),
+        'departure': lambda flight: pd.to_datetime(flight['legs'][0]['departure']),
+        'arrival': lambda flight: pd.to_datetime(flight['legs'][0]['arrival']),
+        'company': lambda flight: flight['legs'][0]['carriers']['marketing'][0]['name'],
+        'self_transfer': lambda flight: flight['isSelfTransfer'],
+        'fare_isChangeAllowed': lambda flight: flight['farePolicy']['isChangeAllowed'],
+        'fare_isPartiallyChangeable': lambda flight: flight['farePolicy']['isPartiallyChangeable'],
+        'fare_isCancellationAllowed': lambda flight: flight['farePolicy']['isCancellationAllowed'],
+        'fare_isPartiallyRefundable': lambda flight: flight['farePolicy']['isPartiallyRefundable'],
+        'score': lambda flight: float(flight['score']),
+        'origin_airport': lambda flight: flight['legs'][0]['origin']['name'],
+        'destination_airport': lambda flight: flight['legs'][0]['destination']['name']
+    }
+
+
+    for key, function in flight_result_dict_assigner.items():
+        try:
+            flight_result_dict[key] = function(flight_dict)
+        except KeyError:
+            flight_result_dict[key] = np.nan  
+
+
+    return flight_result_dict
+
+def request_flight_itineraries(countries_airports_df,origin_city,destination_city, date, n_adults= 1, n_children=0, n_infants=0, origin_airport_code=None, 
+                                   destination_airport_code=None, cabin_class="economy",sort_by="best",currency="EUR"):
+    
+    url = "https://sky-scrapper.p.rapidapi.com/api/v2/flights/searchFlightsComplete"
+
+    cabin_class_list = ["economy","premium_economy","business","first"]
+
+    cabin_class = cabin_class if cabin_class in cabin_class_list else "economy"
+
+    try:
+        origin_city_id = countries_airports_df.loc[countries_airports_df["city"].str.lower() == origin_city.lower(), "city_entityId"]
+
+        origin_city_id = str(int(origin_city_id.iloc[0]))
+
+    except:
+        pass
+    try:
+        destination_city_id =  countries_airports_df.loc[countries_airports_df["city"].str.lower() == destination_city.lower(), "city_entityId"]
+
+        destination_city_id = str(int(destination_city_id.iloc[0]))
+
+    except:
+        pass
+    
+    if origin_airport_code != None:
+        try:
+            origin_airport_id = str(int(countries_airports_df.loc[countries_airports_df["city"].str.lower() == destination_city,"city_entityId"].unique()))
+        except:
+            pass
+    if destination_airport_code != None:
+        try:
+            destination_airport_id = str(int(countries_airports_df.loc[countries_airports_df["city"].str.lower() == destination_city,"city_entityId"].unique()))
+        except:
+            pass
+
+    sort_by_dict = {
+        "best": "best",
+        "cheapest": "price_high",
+        "fastest": "fastest",
+        "outbound_take_off": "outbound_take_off_time",
+        "outbound_landing": "outbound_landing_time",
+        "return_take_off": "return_take_off_time",
+        "return_landing": "return_landing_time"
+    }
+
+    sort_by = sort_by_dict.get(sort_by,"best")
+
+    querystring = {"originSkyId":origin_city,"destinationSkyId": destination_city,"originEntityId":origin_city_id,
+                "destinationEntityId":destination_city_id,"date": date,"cabinClass":"economy",
+                "adults":str(n_adults),"childrens":str(n_children),"infants": str(n_infants),"sortBy":sort_by,"currency":currency}
+
+    headers = {
+        "x-rapidapi-key": AIR_SCRAPPER_API_KEY,
+        "x-rapidapi-host": "sky-scrapper.p.rapidapi.com"
+    }
+
+    response = requests.get(url, headers=headers, params=querystring)
+
+    itineraries = response.json()["data"]["itineraries"]
+
+    return itineraries
+
+
+
+def create_itineraries_dataframe(itineraries_dict_list):
+
+    extracted_itinerary_info_list = list()
+
+    for itinerary in itineraries_dict_list:
+        extracted_itinerary_info_list.append(extract_flight_info(itinerary))
+        
+    return pd.DataFrame(extracted_itinerary_info_list)
+
+
+### Acommodations - booking - scraping
 
 def build_booking_url_full(destination: str, checkin: str, checkout: str, adults: int = 1, children: int = 0,
                            rooms: int = 1, min_price: int = 1, max_price: int = 1, star_ratings: list = None, 
@@ -127,7 +295,7 @@ def scrape_accommodations_from_page(page_soup, verbose=False):
 
     accommodation_data_dict = {key: [] for key in accommodation_scraper_dict}
 
-    for accommodation_card in soup.findAll("div", {"aria-label":"Alojamiento"}):
+    for accommodation_card in page_soup.findAll("div", {"aria-label":"Alojamiento"}):
             for key, accommodation_scraper_function in accommodation_scraper_dict.items():
                 try:
                     accommodation_data_dict[key].append(accommodation_scraper_function(accommodation_card))
