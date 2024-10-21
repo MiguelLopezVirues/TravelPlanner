@@ -12,6 +12,9 @@ requests = "*"
 beautifulsoup4 = "*"
 webdriver-manager = "*"
 scipy = "*"
+matplotlib = "*"
+seaborn = "*"
+tqdm = "*"
 
 [dev-packages]
 
