@@ -8,22 +8,22 @@
 6,spain,Madrid,27544850,MAD,95565077,Madrid
 7,spain,Barcelona,27548283,BCN,95565085,Barcelona
 8,spain,Port Of Spain,27546011,POS,104120358,Port Of Spain
-9,spain,Málaga,27547484,AGP,95565095,Malaga
-10,spain,Seville,27547022,SVQ,95565089,Seville
-11,spain,Valencia,27547405,VLC,95565090,Valencia
-12,spain,Santiago de Compostela,27546279,SCQ,95565108,Santiago de Compostela
+9,spain,La Gomera Tenerife,44293215,GMZ,95673310,La Gomera Tenerife
+10,spain,Logroño,27548395,RJL,95566287,Logrono
+11,spain,Santiago del Monte,46362301,OVD,95565102,Asturias
+12,spain,Málaga,27547484,AGP,95565095,Malaga
 13,germany,Frankfurt,27541706,FRA,95673652,Frankfurt am Main
 14,germany,Frankfurt,27541706,HHN,95673548,Frankfurt Hahn
 15,germany,Berlin,27547053,BER,95673383,Berlin Brandenburg
-16,germany,Munich,27545034,MUC,95673491,Munich
-17,germany,Stuttgart,27546291,STR,95673677,Stuttgart
-18,germany,Cologne,34235350,CGN,95673544,Cologne
+16,germany,Erfurt,27540942,ERF,128668007,Erfurt
+17,germany,Hannover,27541989,HAJ,95673715,Hannover
+18,germany,Paderborn,34341059,PAD,128667762,Paderborn
 19,thailand,Bangkok,27536671,BKK,95673349,Bangkok Suvarnabhumi
 20,thailand,Bangkok,27536671,DMK,95673350,Don Mueang
 21,thailand,Phuket,27542069,HKT,104120378,Phuket
-22,thailand,Mae Hong Son,27542042,HGN,104120382,Mae Hong Son
-23,thailand,Phrae,27544960,PRH,104120292,Phrae
-24,thailand,Surat Thani,37515501,URT,95674156,Surat Thani
+22,thailand,Chiang Mai,27539873,CNX,95674024,Chiang Mai
+23,thailand,Krabi,27543110,KBV,95674159,Krabi
+24,thailand,Ubon Ratchathani,27547305,UBP,95674257,Ubon Ratchathani
 25,bali,Denpasar,27540795,DPS,95673809,Bali (Denpasar)
 26,bali,Balikpapan,27539537,BPN,95673793,Balikpapan
 27,bali,Bari,27539556,BRI,95673888,Bari
@@ -34,7 +34,7 @@
 32,philippines,Caticlan,27544989,MPH,128667778,Caticlan (Boracay)
 33,philippines,Panglao,27547122,TAG,95673598,Bohol-Panglao International
 34,philippines,Puerto Princesa,27546026,PPS,95674098,Puerto Princesa (Palawan)
-35,philippines,Ozamis City,27545283,OZC,128668916,Ozamis City
+35,philippines,Butuan,27539654,BXU,128668354,Bancasi (Butuan)
 36,china,Hong Kong,27542065,HKG,128668132,Hong Kong Intl
 37,china,Shanghai,27546079,PVG,128667077,Shanghai Pudong
 38,china,Shanghai,27546079,SHA,128669004,Shanghai Hongqiao
@@ -43,14 +43,14 @@
 41,australia,Sydney,27547097,SYD,128667058,Sydney
 42,australia,Melbourne,27544894,MEL,95673364,Melbourne Tullamarine
 43,australia,Melbourne,27544894,AVV,128667535,Melbourne Avalon
-44,australia,Mackay,27544955,MKY,95674279,Mackay
-45,australia,Esperance,27540914,EPR,128668155,Esperance
-46,australia,Roma,27550191,RMA,128668822,Roma
+44,australia,Brisbane,27539494,BNE,95673551,Brisbane
+45,australia,Perth,27545934,PER,128668924,Perth
+46,australia,Derby,27540877,DRB,129055669,Derby
 47,italy,Rome,27539793,FCO,95565065,Rome Fiumicino
 48,italy,Rome,27539793,CIA,95565062,Rome Ciampino
 49,italy,Milan,27544068,MXP,95565070,Milan Malpensa
 50,italy,Milan,27544068,BGY,95565071,Milan Bergamo
-51,italy,Palermo,27545989,PMO,95673647,Palermo
+51,italy,Trieste,27547250,TRS,95566283,Trieste
 52,russia,Moscow,27539438,SVO,114137841,Moscow Sheremetyevo
 53,russia,Moscow,27539438,DME,128668012,Moscow Domodedovo
 54,russia,Moscow,27539438,VKO,114093937,Moscow Vnukovo
@@ -60,9 +60,9 @@
 58,romania,Bucharest,27545262,OTP,95673426,Bucharest Otopeni
 59,romania,Bucharest,27545262,BBU,129054661,Bucharest Baneasa
 60,romania,Cluj-Napoca,27539829,CLJ,95673885,Cluj-Napoca
-61,romania,Iasi,27542784,IAS,95673658,Iasi
-62,romania,Timisoara,27547261,TSR,95673890,Timisoara
-63,romania,Oradea,27545225,OMR,95674013,Oradea
+61,romania,Braşov,38634870,GHV,213969669,Brasov-Ghimbav International
+62,romania,Baia Mare,27548255,BAY,95673887,Baia Mare
+63,romania,Sibiu,27546265,SBZ,95674084,Sibiu
 64,united states,New York,27537542,JFK,95565058,New York John F. Kennedy
 65,united states,New York,27537542,EWR,95565059,New York Newark
 66,united states,Los Angeles,27536211,LAX,95673368,Los Angeles International
@@ -112,15 +112,15 @@
 110,colombia,Medellin,27540944,MDE,95673419,José María Córdova International
 111,colombia,Medellin,27540944,EOH,95673418,Medellin Enrique Olaya Herrera
 112,colombia,Cartagena,27540568,CTG,95673470,Cartagena
-113,colombia,San Jose Del Gua,27546357,SJE,128669008,San Jose Del Gua
-114,colombia,Ibague,27542786,IBE,128668646,Ibague
+113,colombia,Cali,27539833,CLO,95673404,Cali
+114,colombia,Acandi,27547472,ACD,128668049,Acandi
 115,morocco,Casablanca,27539689,CMN,95673387,Casablanca Mohamed V.
 116,morocco,Marrakech,27546125,RAK,95673588,Marrakech Menara
 117,morocco,Rabat,27546128,RBA,95673388,Rabat
-118,morocco,Tetuan S. Ramel,27547272,TTU,128667048,Tetuan S. Ramel
-119,morocco,Agadir,27536479,AGA,95673640,Agadir
-120,morocco,Ouarzazate,27545284,OZZ,95674343,Ouarzazate
-121,morocco,Tangier,27547220,TNG,128668513,Tangier Ibn Battouta
+118,morocco,Agadir,27536479,AGA,95673640,Agadir
+119,morocco,Tangier,27547220,TNG,128668513,Tangier Ibn Battouta
+120,morocco,Fes,27541643,FEZ,128668578,Fes-Saïss
+121,morocco,Goulimime,46387648,GLN,128667271,Goulimime
 122,south africa,Cape Town,27539908,CPT,95673380,Cape Town
 123,south africa,Johannesburg,27541777,JNB,95673415,Johannesburg O.R. Tambo
 124,south africa,Johannesburg,27541777,HLA,95673416,Lanseria

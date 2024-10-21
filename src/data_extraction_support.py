@@ -179,8 +179,11 @@ def request_flight_itineraries(countries_airports_df,origin_city,destination_cit
     }
 
     response = requests.get(url, headers=headers, params=querystring)
+    if response.status_code == 200:
+        itineraries = response.json()["data"]["itineraries"]
+    else:
+        raise ValueError
 
-    itineraries = response.json()["data"]["itineraries"]
 
     return itineraries
 
@@ -279,8 +282,10 @@ def scrape_accommodations_from_page(page_soup, verbose=False):
         "name": lambda card: card.find("div",{"data-testid":"title"}).text,
         "url": lambda card: card.find("a",{"data-testid":"title-link"})["href"],
         "price_currency": lambda card: card.find("span",{"data-testid":"price-and-discounted-price"}).text.split()[0],
-        "price_amount": lambda card: card.find("span",{"data-testid":"price-and-discounted-price"}).text.split()[1].replace(".","").replace(",","."),
+        "total_price_amount": lambda card: card.find("span",{"data-testid":"price-and-discounted-price"}).text.split()[1].replace(".","").replace(",","."),
         "distance_city_center_km": lambda card: card.find("span",{"data-testid":"distance"}).text.split()[1].replace(".","").replace(",","."),
+        "score": lambda card: card.find("div",{"data-testid": "review-score"}).find_all("div",recursive=False)[0].find("div").next_sibling.text.strip().replace(",","."),
+        "n_comments": lambda card: card.find("div",{"data-testid": "review-score"}).find_all("div",recursive=False)[1].find("div").next_sibling.text.strip().split()[0].replace(".",""),
         "close_to_metro": lambda card: "Yes" if card.find("span",{"class":"f419a93f12"}) else "No",
         "sustainability_cert": lambda card: "Yes" if card.find("span",{"class":"abf093bdfe e6208ee469 f68ecd98ea"}) else "No",
         "room_type": lambda card: card.find("h4",{"class":"abf093bdfe e8f7c070a7"}).text,
@@ -341,7 +346,7 @@ def scroll_and_click_cycle(driver, css_selector):
             break
 
 
-def extract_all_activities(destination: str, checkin: str, checkout: str, adults: int = 1, children: int = 0,
+def extract_all_accommodations(destination: str, checkin: str, checkout: str, adults: int = 1, children: int = 0,
                            rooms: int = 1, min_price: int = 1, max_price: int = 1, star_ratings: list = None, 
                            meal_plan: str = None, review_score: list = None, max_distance_meters: int = None, verbose=False):
     accommodation_link = build_booking_url_full(
@@ -390,9 +395,13 @@ def get_pagination_htmls_by_city_date(city_name, date_start, date_end, page_star
         driver.get(activities_link)
         driver.maximize_window()
         
+        # make sure availability cards and amount of available activities show in the page
+        time.sleep(1)
         driver.implicitly_wait(20)
         driver.execute_script('window.scrollBy(0, 4000)')
         driver.find_element("css selector","div.m-availability")
+        driver.find_element("css selector","#activitiesShowing")
+
         
 
         html_content = driver.page_source
@@ -489,6 +498,7 @@ def extract_all_activities(city_name, date_start, date_end, verbose=False):
     driver.get(first_link)
 
     # make sure availability cards and amount of available activities show in the page
+    time.sleep(1)
     driver.implicitly_wait(20)
     driver.find_element("css selector","div.m-availability")
     driver.find_element("css selector","#activitiesShowing")
